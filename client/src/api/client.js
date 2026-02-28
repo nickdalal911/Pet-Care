@@ -1,0 +1,21 @@
+import axios from "axios";
+
+let authToken = "";
+
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+});
+
+apiClient.interceptors.request.use((config) => {
+  if (authToken) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${authToken}`;
+  }
+  return config;
+});
+
+export const setAuthToken = (token) => {
+  authToken = token || "";
+};
+
+export default apiClient;
