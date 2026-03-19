@@ -17,6 +17,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.get("/test", (req, res) => {
+  res.send("TEST WORKING");
+});
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
