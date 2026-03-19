@@ -86,9 +86,15 @@ Give helpful, clear, and short answers.`,
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+  Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+  "Content-Type": "application/json",
+  "HTTP-Referer": "https://petcare16.netlify.app", // 🔥 REQUIRED
+  "X-Title": "PetCare AI" // 🔥 REQUIRED
+}
+        // headers: {
+        //   Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        //   "Content-Type": "application/json",
+        // },
       }
     );
 
