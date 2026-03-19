@@ -31,6 +31,16 @@ const listingSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    contactName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    contactPhone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     photos: {
       type: [String],
       default: [],

@@ -12,6 +12,9 @@ const servicesRoutes = require("./routes/servicesRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const authRoutes = require("./routes/authRoutes");
 
+const chatRoutes = require("./routes/chat");
+
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -32,17 +35,12 @@ app.use("/api/products", productsRoutes);
 app.use("/api/services", servicesRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.use((err, _req, res, _next) => {
-  const status = err.status || 500;
-  const message = status === 400 ? err.message : "Server error";
-  console.error(err);
-  res.status(status).json({ message, error: err.cause?.message || err.message });
-});
 
 connectDB()
   .then(() => {

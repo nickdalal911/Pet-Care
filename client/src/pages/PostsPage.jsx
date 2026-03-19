@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiClient from "../api/client";
 import { buildMediaUrl } from "../api/helpers";
 import PageHeader from "../components/PageHeader";
 import SectionCard from "../components/SectionCard";
-import SummaryBar from "../components/SummaryBar";
 import EmptyState from "../components/EmptyState";
 import Modal from "../components/Modal";
 import { useAuth } from "../context/AuthContext";
@@ -265,29 +264,11 @@ const PostsPage = () => {
     return date.toLocaleString();
   };
 
-  const summaryItems = useMemo(() => {
-    if (!posts.length) {
-      return [{ label: "Total posts", value: 0 }];
-    }
-
-    const withImages = posts.filter((post) => Boolean(post.imageUrl)).length;
-    const latest = posts[0]?.createdAt
-      ? new Date(posts[0].createdAt).toLocaleString()
-      : "—";
-
-    return [
-      { label: "Total posts", value: posts.length },
-      { label: "Posts with images", value: withImages },
-      { label: "Latest update", value: latest },
-    ];
-  }, [posts]);
-
   return (
     <section className="page">
       <PageHeader
         title="Pet Posts"
         description="Celebrate every milestone and adorable moment from your community feed."
-        meta={<SummaryBar items={summaryItems} />}
         actions={
           canManagePosts ? (
             <button
@@ -342,17 +323,54 @@ const PostsPage = () => {
             }
           />
         ) : (
-          <div className="list-grid">
+          <div className="list-grid post-list">
             {posts.map((post) => (
-              <article key={post._id} className="card">
+              <article key={post._id} className="card post-card">
                 <div className="card-header">
-                  <div>
-                    <h3 className="card-title">
-                      {post.author?.name || post.authorName || "Pet lover"}
-                    </h3>
-                    <p className="card-subtitle">
-                      {new Date(post.createdAt).toLocaleString()}
-                    </p>
+                  <div className="post-author-section">
+                    {post.author?._id ? (
+                      <Link
+                        to="/users"
+                        className="post-author-avatar"
+                        title={post.author?.name || "View profile"}
+                      >
+                        {post.author?.avatarUrl ? (
+                          <img
+                            src={buildMediaUrl(post.author.avatarUrl)}
+                            alt={post.author.name}
+                          />
+                        ) : (
+                          <span className="post-author-avatar__placeholder">
+                            🐾
+                          </span>
+                        )}
+                      </Link>
+                    ) : (
+                      <div className="post-author-avatar">
+                        <span className="post-author-avatar__placeholder">
+                          🐾
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="card-title">
+                        {post.author?._id ? (
+                          <Link
+                            to="/users"
+                            className="post-author-name"
+                          >
+                            {post.author?.name || post.authorName || "Pet lover"}
+                          </Link>
+                        ) : (
+                          <span>
+                            {post.author?.name || post.authorName || "Pet lover"}
+                          </span>
+                        )}
+                      </h3>
+                      <p className="card-subtitle">
+                        {new Date(post.createdAt).toLocaleString()}
+                      </p>
+                    </div>
                   </div>
                   {isPostOwner(post) ? (
                     <div
@@ -397,7 +415,7 @@ const PostsPage = () => {
                 </div>
                 <div className="card-body">{post.caption}</div>
                 {post.imageUrl && (
-                  <div className="card-media">
+                  <div className="card-media post-media">
                     <img
                       src={buildMediaUrl(post.imageUrl)}
                       alt={post.caption}

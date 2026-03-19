@@ -9,6 +9,7 @@ import UsersPage from "./pages/UsersPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { useAuth } from "./context/AuthContext";
+import ChatBot from "./components/ChatBot";
 
 const App = () => {
   const { user, logout, loading } = useAuth();
@@ -137,6 +138,7 @@ const App = () => {
           </p>
         </div>
       </footer>
+      <ChatBot />
     </div>
   );
 };

@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["Dog", "Cat", "Fish", "Accessories", "Food"],
+      enum: ["Dog", "Cat", "Fish", "Others"],
       default: "Dog",
     },
     affiliateLink: {

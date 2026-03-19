@@ -27,7 +27,13 @@ exports.getServiceById = async (req, res) => {
 
 exports.createService = async (req, res) => {
   try {
-    const service = await Service.create(req.body);
+    const serviceData = { ...req.body };
+    
+    if (req.file) {
+      serviceData.image = `/uploads/${req.file.filename}`;
+    }
+    
+    const service = await Service.create(serviceData);
     res.status(201).json(service);
   } catch (error) {
     res
@@ -38,7 +44,13 @@ exports.createService = async (req, res) => {
 
 exports.updateService = async (req, res) => {
   try {
-    const service = await Service.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+    
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
+    
+    const service = await Service.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });

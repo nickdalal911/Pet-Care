@@ -9,7 +9,7 @@ import EmptyState from "../components/EmptyState";
 import Modal from "../components/Modal";
 import { useAuth } from "../context/AuthContext";
 
-const CATEGORY_OPTIONS = ["All", "Dog", "Cat", "Fish", "Accessories", "Food"];
+const CATEGORY_OPTIONS = ["All", "Dog", "Cat", "Fish", "Others"];
 
 const createInitialForm = () => ({
   title: "",
@@ -219,9 +219,9 @@ const ProductsPage = () => {
             }
           />
         ) : (
-          <div className="list-grid">
+          <div className="list-grid product-list">
             {products.map((product) => (
-              <article key={product._id} className="card">
+              <article key={product._id} className="card product-card">
                 <div className="card-media product-image">
                   {product.image ? (
                     <img
@@ -234,17 +234,21 @@ const ProductsPage = () => {
                   )}
                 </div>
 
-                <div className="card-header">
-                  <div>
-                    <h3 className="card-title">{product.title}</h3>
-                    <p className="card-subtitle">{product.category}</p>
+                <div className="product-card__details">
+                  <div className="card-header">
+                    <div>
+                      <h3 className="card-title">{product.title}</h3>
+                      <p className="card-subtitle">{product.category}</p>
+                    </div>
                   </div>
-                </div>
-                <p className="card-body">{product.description || "No description available."}</p>
-                <div className="card-actions">
-                  <button type="button" onClick={() => handleBuy(product._id)}>
-                    Buy on Amazon
-                  </button>
+                  <p className="card-body">
+                    {product.description || "No description available."}
+                  </p>
+                  <div className="card-actions">
+                    <button type="button" onClick={() => handleBuy(product._id)}>
+                      Buy on Amazon
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

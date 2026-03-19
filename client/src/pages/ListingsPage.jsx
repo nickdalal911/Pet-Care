@@ -16,9 +16,23 @@ const createInitialForm = () => ({
   age: "",
   price: "",
   location: "",
+  contactName: "",
+  contactPhone: "",
   description: "",
   photos: [],
 });
+
+const formatInrPrice = (value) => {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return "-";
+  }
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(numeric);
+};
 
 const ListingsPage = () => {
   const navigate = useNavigate();
@@ -137,6 +151,8 @@ const ListingsPage = () => {
       age: listing.age || "",
       price: listing.price != null ? String(listing.price) : "",
       location: listing.location || "",
+      contactName: listing.contactName || "",
+      contactPhone: listing.contactPhone || "",
       description: listing.description || "",
       photos: [],
     });
@@ -160,22 +176,7 @@ const ListingsPage = () => {
   };
 
   const summaryItems = useMemo(() => {
-    if (!listings.length) {
-      return [{ label: "Active listings", value: 0 }];
-    }
-
-    const averagePrice = listings
-      .filter((item) => typeof item.price === "number")
-      .reduce((acc, item, _, array) => acc + item.price / array.length, 0)
-      .toFixed(0);
-
-    const withPhotos = listings.filter((item) => item.photos?.length).length;
-
-    return [
-      { label: "Active listings", value: listings.length },
-      { label: "Average price", value: `$${averagePrice}` },
-      { label: "Listings with photos", value: withPhotos },
-    ];
+    return [{ label: "Active listings", value: listings.length }];
   }, [listings]);
 
   return (
@@ -245,30 +246,42 @@ const ListingsPage = () => {
           <div className="list-grid">
             {listings.map((listing) => (
               <article key={listing._id} className="card">
-                <div className="card-header">
-                  <div>
-                    <h3 className="card-title">{listing.title}</h3>
-                    <p className="card-subtitle">
-                      {listing.location || "Location TBD"}
-                    </p>
-                  </div>
-                  <div className="card-title">${listing.price ?? 0}</div>
-                </div>
-                <div className="card-body">{listing.description}</div>
-                <ul className="meta-list">
-                  {listing.species && <li>Species: {listing.species}</li>}
-                  {listing.breed && <li>Breed: {listing.breed}</li>}
-                  {listing.age && <li>Age: {listing.age}</li>}
-                </ul>
-                {listing.photos?.length > 0 && (
-                  <div className="media-grid">
-                    {listing.photos.map((photo) => (
-                      <div key={photo} className="card-media">
-                        <img src={buildMediaUrl(photo)} alt={listing.title} />
+                <div className="listing-card-layout">
+                  {listing.photos?.length > 0 && (
+                    <div className="media-grid listing-card-layout__media">
+                      {listing.photos.map((photo) => (
+                        <div key={photo} className="card-media listing-media">
+                          <img src={buildMediaUrl(photo)} alt={listing.title} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="listing-card-layout__details">
+                    <div className="card-header">
+                      <div>
+                        <h3 className="card-title">{listing.title}</h3>
+                        <p className="card-subtitle">
+                          {listing.location || "Location TBD"}
+                        </p>
                       </div>
-                    ))}
+                      <div className="card-title">
+                        {formatInrPrice(listing.price ?? 0)}
+                      </div>
+                    </div>
+                    <div className="card-body">{listing.description}</div>
+                    <ul className="meta-list">
+                      {listing.species && <li>Species: {listing.species}</li>}
+                      {listing.breed && <li>Breed: {listing.breed}</li>}
+                      {listing.age && <li>Age: {listing.age}</li>}
+                      {listing.contactName && (
+                        <li>Contact person: {listing.contactName}</li>
+                      )}
+                      {listing.contactPhone && (
+                        <li>Contact number: {listing.contactPhone}</li>
+                      )}
+                    </ul>
                   </div>
-                )}
+                </div>
                 {isProvider && (
                   <div className="card-actions">
                     <button type="button" onClick={() => handleEdit(listing)}>
@@ -336,13 +349,13 @@ const ListingsPage = () => {
               />
             </label>
             <label>
-              Price
+              Price (INR)
               <input
                 name="price"
                 type="number"
                 value={form.price}
                 onChange={handleChange}
-                placeholder="e.g. 150"
+                placeholder="e.g. 15000"
               />
             </label>
             <label>
@@ -352,6 +365,24 @@ const ListingsPage = () => {
                 value={form.location}
                 onChange={handleChange}
                 placeholder="City, state"
+              />
+            </label>
+            <label>
+              Contact person
+              <input
+                name="contactName"
+                value={form.contactName}
+                onChange={handleChange}
+                placeholder="e.g. Rajesh Kumar"
+              />
+            </label>
+            <label>
+              Contact number
+              <input
+                name="contactPhone"
+                value={form.contactPhone}
+                onChange={handleChange}
+                placeholder="e.g. +91 98xxxxxx10"
               />
             </label>
           </div>

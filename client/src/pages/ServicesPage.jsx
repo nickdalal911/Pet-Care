@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiClient from "../api/client";
+import { buildMediaUrl } from "../api/helpers";
 import PageHeader from "../components/PageHeader";
 import SectionCard from "../components/SectionCard";
 import SummaryBar from "../components/SummaryBar";
@@ -14,6 +15,7 @@ const createInitialForm = () => ({
   address: "",
   phone: "",
   description: "",
+  image: null,
 });
 
 const ServicesPage = () => {
@@ -44,6 +46,11 @@ const ServicesPage = () => {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0] || null;
+    setForm((prev) => ({ ...prev, image: file }));
   };
 
   const resetFormState = () => {
@@ -89,10 +96,25 @@ const ServicesPage = () => {
     }
 
     try {
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("type", form.type);
+      formData.append("address", form.address);
+      formData.append("phone", form.phone);
+      formData.append("description", form.description);
+      
+      if (form.image) {
+        formData.append("image", form.image);
+      }
+
       if (editingId) {
-        await apiClient.put(`/services/${editingId}`, form);
+        await apiClient.put(`/services/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       } else {
-        await apiClient.post("/services", form);
+        await apiClient.post("/services", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
       await fetchServices();
       closeModal();
@@ -114,6 +136,7 @@ const ServicesPage = () => {
       address: service.address || "",
       phone: service.phone || "",
       description: service.description || "",
+      image: null, // Keep null for editing, show existing image separately
     });
     setError("");
     setIsModalOpen(true);
@@ -144,15 +167,9 @@ const ServicesPage = () => {
         .map((service) => service.type?.trim())
         .filter((type) => Boolean(type))
     );
-    const withPhone = services.filter((service) =>
-      service.phone?.trim()
-    ).length;
-    const phoneCoverage = Math.round((withPhone / services.length) * 100);
-
     return [
       { label: "Active services", value: services.length },
       { label: "Service categories", value: categories.size || 0 },
-      { label: "Phone coverage", value: `${phoneCoverage}%` },
     ];
   }, [services]);
 
@@ -223,6 +240,15 @@ const ServicesPage = () => {
           <div className="list-grid">
             {services.map((service) => (
               <article key={service._id} className="card">
+                {service.image && (
+                  <div className="card-media">
+                    <img
+                      src={buildMediaUrl(service.image)}
+                      alt={service.name}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
                 <div className="card-header">
                   <div>
                     <h3 className="card-title">{service.name}</h3>
@@ -314,6 +340,15 @@ const ServicesPage = () => {
               value={form.description}
               onChange={handleChange}
               placeholder="Share hours, specialties, or why you recommend them."
+            />
+          </label>
+
+          <label className="form-row">
+            Service photo
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
             />
           </label>
 

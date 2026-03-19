@@ -26,6 +26,39 @@ const UsersPage = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userPosts, setUserPosts] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
+
+  const fetchUserPosts = async () => {
+    if (!user?._id) {
+      return;
+    }
+    setLoadingPosts(true);
+    try {
+      const { data } = await apiClient.get("/posts");
+      const filtered = data.filter((post) => {
+        const author = post.author;
+        if (author?._id) {
+          return author._id === user._id;
+        }
+        if (typeof author === "string") {
+          return author === user._id;
+        }
+        return post.authorName === user.name;
+      });
+      setUserPosts(filtered);
+    } catch (err) {
+      console.error("Failed to fetch user posts:", err);
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?._id) {
+      fetchUserPosts();
+    }
+  }, [user?._id]);
 
   const roleLabel = useMemo(() => {
     if (user?.role === "provider") {
@@ -208,6 +241,57 @@ const UsersPage = () => {
           />
         )}
       </SectionCard>
+
+      {user && (
+        <SectionCard
+          title="Your posts"
+          description="All the moments you've shared with the community."
+        >
+          {loadingPosts ? (
+            <p style={{ textAlign: "center", color: "#5b7087" }}>
+              Loading posts...
+            </p>
+          ) : userPosts.length === 0 ? (
+            <EmptyState
+              title="No posts yet"
+              description="Start sharing your pet moments with the community."
+              action={
+                <Link className="button" to="/posts">
+                  Go to posts
+                </Link>
+              }
+            />
+          ) : (
+            <div className="post-list">
+              {userPosts.map((post) => (
+                <article key={post._id} className="card post-card">
+                  {post.imageUrl && (
+                    <div className="card-media post-media">
+                      <img
+                        src={buildMediaUrl(post.imageUrl)}
+                        alt={post.caption}
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  <div className="card-header">
+                    <div>
+                      <h3 className="card-title">{post.caption.substring(0, 50)}</h3>
+                      <p className="card-subtitle">
+                        {new Date(post.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="card-body">
+                    {post.caption.substring(0, 120)}
+                    {post.caption.length > 120 ? "..." : ""}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+      )}
 
       {user && (
         <Modal
