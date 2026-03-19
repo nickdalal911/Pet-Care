@@ -3,7 +3,7 @@ import axios from "axios";
 let authToken = "";
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://pet-care-r5mi.onrender.com/api",
+  baseURL: "https://pet-care-r5mi.onrender.com/api",
   // withCredentials:true,
   // timeout: 10000,
 });
