@@ -1,5 +1,12 @@
 const Product = require("../models/Product");
 
+const AMAZON_DISCLOSURE =
+  "This website participates in the Amazon Associates Program and earns from qualifying purchases.";
+
+exports.getAffiliateDisclosure = async (_req, res) => {
+  res.json({ description: AMAZON_DISCLOSURE });
+};
+
 exports.getProducts = async (req, res) => {
   try {
     const filter = {};
@@ -18,14 +25,21 @@ exports.getProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    const { title, category, description, affiliateLink } = req.body;
+    const { price, category, description, affiliateLink } = req.body;
+    const parsedPrice = Number(price);
+
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+      return res
+        .status(400)
+        .json({ message: "A valid product price is required" });
+    }
 
     if (!req.file) {
       return res.status(400).json({ message: "Product image is required" });
     }
 
     const product = await Product.create({
-      title,
+      price: parsedPrice,
       category,
       description,
       affiliateLink,

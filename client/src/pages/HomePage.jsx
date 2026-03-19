@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../api/client";
 import SectionCard from "../components/SectionCard";
 
 const stats = [
@@ -30,11 +32,11 @@ const featureCards = [
     link: { to: "/services", label: "View directory" },
   },
   {
-    icon: "🤝",
-    title: "Collaborative profiles",
+    icon: "🛒",
+    title: "Products",
     description:
-      "Let caretakers highlight bios, specialties, and availability in one friendly space.",
-    link: { to: "/users", label: "Meet the team" },
+      "Discover trusted pet essentials and curated affiliate picks in one convenient catalog.",
+    link: { to: "/products", label: "Shop products" },
   },
 ];
 
@@ -57,6 +59,26 @@ const faqs = [
 ];
 
 const HomePage = () => {
+  const defaultDisclosure =
+    "This website participates in the Amazon Associates Program and earns from qualifying purchases.";
+  const [affiliateDisclosure, setAffiliateDisclosure] =
+    useState(defaultDisclosure);
+
+  useEffect(() => {
+    const fetchDisclosure = async () => {
+      try {
+        const { data } = await apiClient.get("/products/disclosure");
+        if (data?.description) {
+          setAffiliateDisclosure(data.description);
+        }
+      } catch {
+        setAffiliateDisclosure(defaultDisclosure);
+      }
+    };
+
+    fetchDisclosure();
+  }, []);
+
   return (
     <section className="page landing-page">
       <div className="landing-hero">
@@ -176,6 +198,7 @@ const HomePage = () => {
             </div>
           ))}
         </dl>
+        <p className="affiliate-disclaimer">{affiliateDisclosure}</p>
       </SectionCard>
 
       <footer className="landing-footer">

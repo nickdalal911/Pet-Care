@@ -10,9 +10,14 @@ import Modal from "../components/Modal";
 import { useAuth } from "../context/AuthContext";
 
 const CATEGORY_OPTIONS = ["All", "Dog", "Cat", "Fish", "Others"];
+const inrFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 2,
+});
 
 const createInitialForm = () => ({
-  title: "",
+  price: "",
   description: "",
   category: "Dog",
   affiliateLink: "",
@@ -103,7 +108,7 @@ const ProductsPage = () => {
       }
 
       const formData = new FormData();
-      formData.append("title", form.title);
+      formData.append("price", form.price);
       formData.append("category", form.category);
       formData.append("description", form.description);
       formData.append("affiliateLink", form.affiliateLink);
@@ -226,7 +231,7 @@ const ProductsPage = () => {
                   {product.image ? (
                     <img
                       src={buildMediaUrl(product.image)}
-                      alt={product.title}
+                      alt={`Product in ${product.category} category`}
                       loading="lazy"
                     />
                   ) : (
@@ -237,7 +242,9 @@ const ProductsPage = () => {
                 <div className="product-card__details">
                   <div className="card-header">
                     <div>
-                      <h3 className="card-title">{product.title}</h3>
+                      <h3 className="card-title">
+                        {inrFormatter.format(Number(product.price) || 0)}
+                      </h3>
                       <p className="card-subtitle">{product.category}</p>
                     </div>
                   </div>
@@ -256,7 +263,8 @@ const ProductsPage = () => {
         )}
 
         <p className="affiliate-disclaimer">
-          As an Amazon Associate, we earn from qualifying purchases.
+          This website participates in the Amazon Associates Program and earns
+          from qualifying purchases.
         </p>
       </SectionCard>
 
@@ -269,12 +277,15 @@ const ProductsPage = () => {
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <label>
-              Product title
+              Price
               <input
-                name="title"
-                value={form.title}
+                type="number"
+                name="price"
+                value={form.price}
                 onChange={handleChange}
-                placeholder="e.g. Grain-Free Dog Food"
+                placeholder="e.g. 1499"
+                min="0"
+                step="0.01"
                 data-autofocus
                 required
               />

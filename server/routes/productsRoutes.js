@@ -5,6 +5,7 @@ const authorize = require("../middleware/authorize");
 const { upload, normalizeUploadedImages } = require("../middleware/upload");
 const productsController = require("../controllers/productsController");
 
+router.get("/disclosure", productsController.getAffiliateDisclosure);
 router.get("/", productsController.getProducts);
 router.post(
 	"/",
