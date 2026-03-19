@@ -6,6 +6,10 @@ const axios = require("axios");
 const Product = require("../models/Product");
 const Service = require("../models/Service");
 
+router.get("/", (req, res) => {
+  res.json({ message: "Chat GET working" });
+});
+
 router.post("/", async (req, res) => {
   try {
     const { message } = req.body;

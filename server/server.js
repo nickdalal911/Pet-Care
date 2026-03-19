@@ -49,6 +49,10 @@ app.use("/api/users", usersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 
+app.get("/debug-chat", (req, res) => {
+  res.send("CHAT ROUTE DEBUG ACTIVE");
+});
+
 // ❗️IMPORTANT: 404 should be LAST
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
