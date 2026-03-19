@@ -63,7 +63,6 @@ Services:
 ${services.map(s => `${s.title} - ${s.location}`).join("\n")}
 `;
 
-
 console.log("API KEY:", process.env.OPENROUTER_API_KEY);
 
     // =========================
@@ -106,14 +105,19 @@ Give helpful, clear, and short answers.`,
     res.json({ reply });
 
    } 
-   catch (error) {
-  console.log("FULL ERROR:", error);
-  console.log("ERROR DATA:", error.response?.data);
-  console.log("ERROR MESSAGE:", error.message);
+  catch (error) {
+  console.log("🔥 FULL ERROR START 🔥");
+  console.log(error);
+  console.log("🔥 ERROR RESPONSE 🔥");
+  console.log(error?.response?.data);
+  console.log("🔥 ERROR MESSAGE 🔥");
+  console.log(error.message);
+  console.log("🔥 FULL ERROR END 🔥");
 
   res.json({
     reply: "Something went wrong, please try again 🐾",
   });
+
 }
    
    //catch (error) {
