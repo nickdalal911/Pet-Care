@@ -63,6 +63,9 @@ Services:
 ${services.map(s => `${s.title} - ${s.location}`).join("\n")}
 `;
 
+
+console.log("API KEY:", process.env.OPENROUTER_API_KEY);
+
     // =========================
     // 🤖 AI RESPONSE (OpenRouter)
     // =========================
@@ -102,13 +105,24 @@ Give helpful, clear, and short answers.`,
 
     res.json({ reply });
 
-  } catch (error) {
-    console.log("ERROR:", error.response?.data || error.message);
+   } 
+   catch (error) {
+  console.log("FULL ERROR:", error);
+  console.log("ERROR DATA:", error.response?.data);
+  console.log("ERROR MESSAGE:", error.message);
 
-    res.json({
-      reply: "Something went wrong, please try again 🐾",
-    });
-  }
+  res.json({
+    reply: "Something went wrong, please try again 🐾",
+  });
+}
+   
+   //catch (error) {
+  //   console.log("ERROR:", error.response?.data || error.message);
+
+  //   res.json({
+  //     reply: "Something went wrong, please try again 🐾",
+  //   });
+  // }
 });
 
 module.exports = router;
