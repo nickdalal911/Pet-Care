@@ -1,46 +1,56 @@
 const express = require("express");
 const router = express.Router();
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const axios = require("axios");
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// test route
+// ✅ TEST ROUTE
 router.get("/", (req, res) => {
   res.json({ message: "Chat working 🚀" });
 });
 
+// ✅ MAIN CHAT ROUTE
 router.post("/", async (req, res) => {
   try {
     const { message } = req.body;
 
     if (!message) {
-      return res.json({ reply: "Enter a message 🐾" });
+      return res.json({ reply: "Please enter a message 🐾" });
     }
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-latest"
-      // model: "gemini-1.5-flash",
-    });
+    // 🔥 Gemini Direct API Call (Stable)
+    const response = await axios.post(
+      "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent",
+      {
+        contents: [
+          {
+            parts: [{ text: message }],
+          },
+        ],
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        params: {
+          key: process.env.GEMINI_API_KEY,
+        },
+      }
+    );
 
-    // const result = await model.generateContent(message);
-    const result = await model.generateContent({
-  contents: [
-    {
-      role: "user",
-      parts: [{ text: message }],
-    },
-  ],
-});
-    const reply = result.response.text();
+    // ✅ Extract reply safely
+    const reply =
+      response?.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "No response from AI 🤖";
 
     res.json({ reply });
 
   } catch (error) {
-    // console.log("🔥 GEMINI ERROR:", error);
-    console.log("🔥 FULL ERROR:", error);
-console.log("🔥 RESPONSE:", error?.response?.data);
-console.log("🔥 MESSAGE:", error.message);
-    res.status(500).json({ reply: "AI failed 🐾" });
+    console.log("🔥 GEMINI ERROR START 🔥");
+    console.log(error?.response?.data || error.message);
+    console.log("🔥 GEMINI ERROR END 🔥");
+
+    res.status(500).json({
+      reply: "AI service temporarily unavailable 🐾",
+    });
   }
 });
 
