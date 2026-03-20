@@ -17,24 +17,44 @@ router.post("/", async (req, res) => {
     }
 
     // 🔥 Gemini Direct API Call (Stable)
+
     const response = await axios.post(
-      "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent",
+  "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent",
+  {
+    contents: [
       {
-        contents: [
-          {
-            parts: [{ text: message }],
-          },
-        ],
+        parts: [{ text: message }],
       },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        params: {
-          key: process.env.GEMINI_API_KEY,
-        },
-      }
-    );
+    ],
+  },
+  {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    params: {
+      key: process.env.GEMINI_API_KEY,
+    },
+  }
+);
+
+    // const response = await axios.post(
+    //   "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent",
+    //   {
+    //     contents: [
+    //       {
+    //         parts: [{ text: message }],
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     params: {
+    //       key: process.env.GEMINI_API_KEY,
+    //     },
+    //   }
+    // );
 
     // ✅ Extract reply safely
     const reply =
