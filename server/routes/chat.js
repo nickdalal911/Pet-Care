@@ -82,35 +82,55 @@ ${services.map(s => `${s.title} - ${s.location}`).join("\n")}
     // =========================
     // 🤖 OPENROUTER REQUEST
     // =========================
+
     const response = await axios.post(
-      "https://openrouter.ai/api/v1/chat/completions",
+  "https://openrouter.ai/api/v1/chat/completions",
+  {
+    model: "meta-llama/llama-3-8b-instruct:free",
+    messages: [
       {
-        model: "openai/gpt-3.5-turbo",
-        // model: "mistralai/mistral-7b-instruct",
-        messages: [
-          {
-            role: "system",
-            content: `You are a smart pet care assistant.
-Use platform data if useful:
-${context}
-Keep answers short and helpful.`,
-          },
-          {
-            role: "user",
-            content: message,
-          },
-        ],
+        role: "user",
+        content: message,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://petcare16.netlify.app",
-          "X-Title": "PetCare AI",
-        },
-        timeout: 20000, // prevent hanging
-      }
-    );
+    ],
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://petcare16.netlify.app",
+      "X-Title": "PetCare AI",
+    },
+  }
+);
+//     const response = await axios.post(
+//       "https://openrouter.ai/api/v1/chat/completions",
+//       {
+//         model: "openai/gpt-3.5-turbo",
+//         // model: "mistralai/mistral-7b-instruct",
+//         messages: [
+//           {
+//             role: "system",
+//             content: `You are a smart pet care assistant.
+// Use platform data if useful:
+// ${context}
+// Keep answers short and helpful.`,
+//           },
+//           {
+//             role: "user",
+//             content: message,
+//           },
+//         ],
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+//           "Content-Type": "application/json",
+//           "HTTP-Referer": "https://petcare16.netlify.app",
+//           "X-Title": "PetCare AI",
+//         },
+//         timeout: 20000, // prevent hanging
+//       }   );
 
     const reply =
       response?.data?.choices?.[0]?.message?.content ||
