@@ -83,26 +83,52 @@ ${services.map(s => `${s.title} - ${s.location}`).join("\n")}
     // 🤖 OPENROUTER REQUEST
     // =========================
 
-    const response = await axios.post(
-  "https://openrouter.ai/api/v1/chat/completions",
-  {
-    model: "meta-llama/llama-3-8b-instruct:free",
-    messages: [
-      {
-        role: "user",
-        content: message,
-      },
-    ],
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://petcare16.netlify.app",
-      "X-Title": "PetCare AI",
-    },
+    const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+router.post("/", async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
+
+    const result = await model.generateContent(message);
+    const reply = result.response.text();
+
+    res.json({ reply });
+
+  } catch (error) {
+    console.log("GEMINI ERROR:", error.message);
+
+    res.json({
+      reply: "AI service temporarily unavailable 🐾",
+    });
   }
-);
+});
+
+//     const response = await axios.post(
+//   "https://openrouter.ai/api/v1/chat/completions",
+//   {
+//     model: "meta-llama/llama-3-8b-instruct:free",
+//     messages: [
+//       {
+//         role: "user",
+//         content: message,
+//       },
+//     ],
+//   },
+//   {
+//     headers: {
+//       Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+//       "Content-Type": "application/json",
+//       "HTTP-Referer": "https://petcare16.netlify.app",
+//       "X-Title": "PetCare AI",
+//     },
+//   }
+// );
 //     const response = await axios.post(
 //       "https://openrouter.ai/api/v1/chat/completions",
 //       {
