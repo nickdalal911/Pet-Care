@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
     // 🔥 Gemini Direct API Call (Stable)
 
 const response = await axios.post(
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent",
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent",
   {
     contents: [
       {
