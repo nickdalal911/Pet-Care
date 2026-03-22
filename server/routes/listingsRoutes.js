@@ -1,12 +1,15 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const { upload, normalizeUploadedImages } = require("../middleware/upload");
-const auth = require("../middleware/auth");
-const authorize = require("../middleware/authorize");
-const listingsController = require("../controllers/listingsController");
+
+import { upload, normalizeUploadedImages } from "../middleware/upload.js";
+import auth from "../middleware/auth.js";
+import authorize from "../middleware/authorize.js";
+import * as listingsController from "../controllers/listingsController.js";
 
 router.get("/", listingsController.getListings);
+
 router.get("/:id", listingsController.getListingById);
+
 router.post(
   "/",
   auth,
@@ -15,6 +18,7 @@ router.post(
   normalizeUploadedImages,
   listingsController.createListing
 );
+
 router.put(
   "/:id",
   auth,
@@ -23,6 +27,7 @@ router.put(
   normalizeUploadedImages,
   listingsController.updateListing
 );
+
 router.delete(
   "/:id",
   auth,
@@ -30,4 +35,4 @@ router.delete(
   listingsController.deleteListing
 );
 
-module.exports = router;
+export default router;

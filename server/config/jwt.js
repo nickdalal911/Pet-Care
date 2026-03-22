@@ -19,4 +19,4 @@ const getJwtSecret = () => {
   return DEFAULT_SECRET;
 };
 
-module.exports = { getJwtSecret };
+export { getJwtSecret };

@@ -1,14 +1,13 @@
-const express = require("express");
+import express from "express";
+import axios from "axios";
+
 const router = express.Router();
-const axios = require("axios");
 
-// ✅ TEST ROUTE
-router.get("/", (req, res) => {
-  res.json({ message: "Chat working 🚀" });
-});
-
-// ✅ MAIN CHAT ROUTE
 router.post("/", async (req, res) => {
+
+  console.log("KEY:", process.env.OPENROUTER_API_KEY);
+  console.log("✅ CHAT ROUTE HIT");
+
   try {
     const { message } = req.body;
 
@@ -16,57 +15,38 @@ router.post("/", async (req, res) => {
       return res.json({ reply: "Please enter a message 🐾" });
     }
 
-    // 🔥 Gemini Direct API Call (Stable)
-
-const response = await axios.post(
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent",
-  {
-    contents: [
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
       {
-        parts: [{ text: message }],
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful pet care assistant. Give friendly, short, and helpful advice about pets.",
+          },
+          {
+            role: "user",
+            content: message,
+          },
+        ],
       },
-    ],
-  },
-  {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    params: {
-      key: process.env.GEMINI_API_KEY,
-    },
-  }
-);
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    // const response = await axios.post(
-    //   "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent",
-    //   {
-    //     contents: [
-    //       {
-    //         parts: [{ text: message }],
-    //       },
-    //     ],
-    //   },
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     params: {
-    //       key: process.env.GEMINI_API_KEY,
-    //     },
-    //   }
-    // );
-
-    // ✅ Extract reply safely
     const reply =
-      response?.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      response?.data?.choices?.[0]?.message?.content ||
       "No response from AI 🤖";
 
     res.json({ reply });
 
   } catch (error) {
-    console.log("🔥 GEMINI ERROR START 🔥");
-    console.log(error?.response?.data || error.message);
-    console.log("🔥 GEMINI ERROR END 🔥");
+    console.log("🔥 OPENROUTER ERROR:", error?.response?.data || error.message);
 
     res.status(500).json({
       reply: "AI service temporarily unavailable 🐾",
@@ -74,4 +54,4 @@ const response = await axios.post(
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
@@ -17,6 +17,14 @@ const postSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    likes: [{ type: String }],
+
+    comments: [
+      {
+        user: { type: String },
+        text: { type: String },
+      },
+    ],
     imageUrl: {
       type: String,
       default: "",
@@ -26,4 +34,4 @@ const postSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Post", postSchema);
+export default mongoose.model("Post", postSchema);

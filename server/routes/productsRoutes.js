@@ -1,20 +1,24 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const auth = require("../middleware/auth");
-const authorize = require("../middleware/authorize");
-const { upload, normalizeUploadedImages } = require("../middleware/upload");
-const productsController = require("../controllers/productsController");
+
+import auth from "../middleware/auth.js";
+import authorize from "../middleware/authorize.js";
+import { upload, normalizeUploadedImages } from "../middleware/upload.js";
+import * as productsController from "../controllers/productsController.js";
 
 router.get("/disclosure", productsController.getAffiliateDisclosure);
+
 router.get("/", productsController.getProducts);
+
 router.post(
-	"/",
-	auth,
-	authorize("provider"),
-	upload.single("image"),
-	normalizeUploadedImages,
-	productsController.createProduct
+  "/",
+  auth,
+  authorize("provider"),
+  upload.single("image"),
+  normalizeUploadedImages,
+  productsController.createProduct
 );
+
 router.get("/redirect/:id", productsController.redirectToAffiliate);
 
-module.exports = router;
+export default router;

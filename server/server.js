@@ -1,38 +1,49 @@
-require("dotenv").config();
-const path = require("path");
-const express = require("express");
-const cors = require("cors");
-const morgan = require("morgan");
-const connectDB = require("./config/db");
+import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
-const postsRoutes = require("./routes/postsRoutes");
-const listingsRoutes = require("./routes/listingsRoutes");
-const productsRoutes = require("./routes/productsRoutes");
-const servicesRoutes = require("./routes/servicesRoutes");
-const usersRoutes = require("./routes/usersRoutes");
-const authRoutes = require("./routes/authRoutes");
-const chatRoutes = require("./routes/chat");
+import express from "express";
+import morgan from "morgan";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+import connectDB from "./config/db.js";
+
+import postsRoutes from "./routes/postsRoutes.js";
+import listingsRoutes from "./routes/listingsRoutes.js";
+import productsRoutes from "./routes/productsRoutes.js";
+import servicesRoutes from "./routes/servicesRoutes.js";
+import usersRoutes from "./routes/usersRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import chatRoutes from "./routes/chat.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// ✅ Fix __dirname (ES Modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// app.use(cors());
-app.use(cors({
-  origin: "https://petcare16.netlify.app",
-  credentials: true
-}));
+// ✅ FIX 1: Better CORS (works for dev + deployment)
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+// Middleware
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-app.get("/check-server", (req, res) => {
+// Test route
+app.get("/check-server", (_req, res) => {
   res.send("SERVER V2 RUNNING");
 });
 
-// Static
+// Static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Health route
@@ -40,7 +51,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-// ✅ ROUTES (keep these BEFORE 404)
+// Routes
 app.use("/api/posts", postsRoutes);
 app.use("/api/listings", listingsRoutes);
 app.use("/api/products", productsRoutes);
@@ -49,23 +60,29 @@ app.use("/api/users", usersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 
-app.get("/debug-chat", (req, res) => {
+// Debug route
+app.get("/debug-chat", (_req, res) => {
   res.send("CHAT ROUTE DEBUG ACTIVE");
 });
 
-// ❗️IMPORTANT: 404 should be LAST
-app.use((req, res) => {
+// 404
+app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// DB + Server start
-connectDB()
-  .then(() => {
+// ✅ FIX 2: Add logs + proper DB connection
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log("MongoDB Connected ✅");
+
     app.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
+      console.log(`Server running on port ${PORT} 🚀`);
     });
-  })
-  .catch((error) => {
-    console.error("Failed to connect to database", error);
+  } catch (error) {
+    console.error("MongoDB connection error ❌", error);
     process.exit(1);
-  });
+  }
+};
+
+startServer();

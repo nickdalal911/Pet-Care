@@ -1,12 +1,15 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const auth = require("../middleware/auth");
-const authorize = require("../middleware/authorize");
-const { upload, normalizeUploadedImages } = require("../middleware/upload");
-const servicesController = require("../controllers/servicesController");
+
+import auth from "../middleware/auth.js";
+import authorize from "../middleware/authorize.js";
+import { upload, normalizeUploadedImages } from "../middleware/upload.js";
+import * as servicesController from "../controllers/servicesController.js";
 
 router.get("/", servicesController.getServices);
+
 router.get("/:id", servicesController.getServiceById);
+
 router.post(
   "/",
   auth,
@@ -15,6 +18,7 @@ router.post(
   normalizeUploadedImages,
   servicesController.createService
 );
+
 router.put(
   "/:id",
   auth,
@@ -23,6 +27,7 @@ router.put(
   normalizeUploadedImages,
   servicesController.updateService
 );
+
 router.delete(
   "/:id",
   auth,
@@ -30,4 +35,4 @@ router.delete(
   servicesController.deleteService
 );
 
-module.exports = router;
+export default router;

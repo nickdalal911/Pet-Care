@@ -1,10 +1,12 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const { upload, normalizeUploadedImages } = require("../middleware/upload");
-const usersController = require("../controllers/usersController");
-const auth = require("../middleware/auth");
+
+import { upload, normalizeUploadedImages } from "../middleware/upload.js";
+import * as usersController from "../controllers/usersController.js";
+import auth from "../middleware/auth.js";
 
 router.get("/me", auth, usersController.getCurrentUser);
+
 router.put(
   "/me",
   auth,
@@ -13,4 +15,4 @@ router.put(
   usersController.updateCurrentUser
 );
 
-module.exports = router;
+export default router;

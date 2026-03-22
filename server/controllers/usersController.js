@@ -1,26 +1,30 @@
-const User = require("../models/User");
+import User from "../models/User.js";
 
 const normalizePath = (file) => (file ? `/uploads/${file.filename}` : "");
 
-const toSafe = (user) => (user?.toSafeObject ? user.toSafeObject() : user);
+const toSafe = (user) =>
+  user?.toSafeObject ? user.toSafeObject() : user;
 
-exports.getCurrentUser = async (req, res) => {
+export const getCurrentUser = async (req, res) => {
   res.json(toSafe(req.user));
 };
 
-exports.updateCurrentUser = async (req, res) => {
+export const updateCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     const updatableFields = ["name", "bio", "location"];
+
     if (req.user.role === "provider") {
       if (typeof req.body.licenseNumber !== "undefined") {
         user.licenseNumber = req.body.licenseNumber.trim();
       }
     }
+
     updatableFields.forEach((field) => {
       if (typeof req.body[field] !== "undefined") {
         user[field] = req.body[field];
@@ -32,10 +36,12 @@ exports.updateCurrentUser = async (req, res) => {
     }
 
     const updated = await user.save();
+
     res.json(toSafe(updated));
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to update profile", error: error.message });
+    res.status(400).json({
+      message: "Failed to update profile",
+      error: error.message,
+    });
   }
 };

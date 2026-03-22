@@ -3,9 +3,7 @@ import axios from "axios";
 let authToken = "";
 
 const apiClient = axios.create({
-  baseURL: "https://pet-care-r5mi.onrender.com/api",
-  // withCredentials:true,
-  // timeout: 10000,
+  baseURL: "http://localhost:5000/api",
 });
 
 apiClient.interceptors.request.use((config) => {

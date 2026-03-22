@@ -1,29 +1,32 @@
-const Product = require("../models/Product");
+import Product from "../models/Product.js";
 
 const AMAZON_DISCLOSURE =
   "This website participates in the Amazon Associates Program and earns from qualifying purchases.";
 
-exports.getAffiliateDisclosure = async (_req, res) => {
+export const getAffiliateDisclosure = async (_req, res) => {
   res.json({ description: AMAZON_DISCLOSURE });
 };
 
-exports.getProducts = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const filter = {};
+
     if (req.query.category) {
       filter.category = req.query.category;
     }
 
     const products = await Product.find(filter).sort({ createdAt: -1 });
+
     res.json(products);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch products", error: error.message });
+    res.status(500).json({
+      message: "Failed to fetch products",
+      error: error.message,
+    });
   }
 };
 
-exports.createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
     const { price, category, description, affiliateLink } = req.body;
     const parsedPrice = Number(price);
@@ -35,7 +38,9 @@ exports.createProduct = async (req, res) => {
     }
 
     if (!req.file) {
-      return res.status(400).json({ message: "Product image is required" });
+      return res
+        .status(400)
+        .json({ message: "Product image is required" });
     }
 
     const product = await Product.create({
@@ -48,13 +53,14 @@ exports.createProduct = async (req, res) => {
 
     res.status(201).json(product);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to create product", error: error.message });
+    res.status(400).json({
+      message: "Failed to create product",
+      error: error.message,
+    });
   }
 };
 
-exports.redirectToAffiliate = async (req, res) => {
+export const redirectToAffiliate = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
@@ -67,15 +73,16 @@ exports.redirectToAffiliate = async (req, res) => {
     }
 
     if (!product.affiliateLink) {
-      return res
-        .status(400)
-        .json({ message: "Affiliate link is missing for this product" });
+      return res.status(400).json({
+        message: "Affiliate link is missing for this product",
+      });
     }
 
     return res.redirect(product.affiliateLink);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to process redirect", error: error.message });
+    res.status(500).json({
+      message: "Failed to process redirect",
+      error: error.message,
+    });
   }
 };
